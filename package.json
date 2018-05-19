@@ -1,7 +1,7 @@
 {
     "name": "mini-report",
     "version": "0.0.1",
-    "main": "./lib/index.js",
+    "main": "index.js",
     "dependencies": {},
     "devDependencies": {
         "babel-core": "^6.26.0",
@@ -11,17 +11,16 @@
         "babel-preset-env": "^1.6.1"
     },
     "scripts": {
-        "compile": "babel -d ./lib/js ./js && babel -d ./lib ./index.js && npm pack"
     },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/shixia226/mini-report.git"
     },
     "author": "shixia",
-    "license": "ISC",
+    "license": "MIT",
     "bugs": {
         "url": "https://github.com/shixia226/mini-report/issues"
     },
     "homepage": "https://github.com/shixia226/mini-report#readme",
-    "description": ""
+    "description": "Mini Report"
 }

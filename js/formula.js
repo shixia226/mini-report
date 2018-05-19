@@ -12,11 +12,11 @@ const regNumber = /^\d+(\.\d+)?$/;
 
 export default class Formula {
     constructor(formulas, headers) {
-        var fms = this.formulas = [],
-            wrapFms = this.wrapFormulas = [];
+        let fms = this.fmls = [],
+            wrapFmls = this.wrapFmls = [];
         formulas = util.array(formulas);
-        for (var i = 0, len = formulas.length; i < len; i++) {
-            var formula = formulas[i];
+        for (let i = 0, len = formulas.length; i < len; i++) {
+            let formula = formulas[i];
             if (!formula) continue;
             if (util.isString(formula)) {
                 formula = {
@@ -26,58 +26,73 @@ export default class Formula {
             } else {
                 if (!util.isString(formula.formula)) continue;
                 formula.formula = formula.formula.toLowerCase();
-                formula.field = util.indexOf(headers, formula.field); //field为-1时表示对下级作统计
+                formula.label = formula.label;
+                let field = formula.field;
+                if (util.isString(field)) {
+                    formula.field = util.indexOf(headers, field); //field为-1时表示对下级作统计
+                } else {
+                    field = parseInt(field);
+                    formula.field = field >= 0 && field < headers.length ? field : -1;
+                }
             }
             if (util.indexOf(FORMULAS, formula.formula) !== -1) {
                 if (formula.field !== -1) {
                     fms.push(formula);
                 } else {
-                    wrapFms.push(formula);
+                    wrapFmls.push(formula);
                 }
             }
         }
         this.empty = fms.length === 0;
     }
+    formulas() {
+        let fmls = [];
+        for (let i = 0, len = this.fmls.length; i < len; i++) {
+            let formula = this.fmls[i];
+            fmls.push(formula.label || formula.formula);
+        }
+        return fmls;
+    }
     collect(rData, datas, field) {
         if (!this.empty) {
-            if (datas) datas = [];
-            for (var i = 0, len = this.formulas.length; i < len; i++) {
-                (datas[i] = datas[i] || []).push(rData[this.formulas[i].field]);
+            if (!datas) datas = [];
+            for (let i = 0, len = this.fmls.length; i < len; i++) {
+                (datas[i] = datas[i] || []).push(rData[this.fmls[i].field]);
             }
             return datas;
         }
     }
     export (datas, count) {
-        var tmpData = [];
-        for (var i = 0, len = this.wrapFormulas.length; i < len; i++) {
-            var formula = this.wrapFormulas[i];
+        let tmpData = [];
+        for (let i = 0, len = this.wrapFmls.length; i < len; i++) {
+            let formula = this.wrapFmls[i];
             tmpData.push({
-                formula: formula.formula,
+                formula: formula.label || formula.formula,
                 datas: format(datas, count, formula)
             });
         }
         return tmpData;
     }
     format(datas, count) {
-        return format(datas, count, this.formulas);
+        return format(datas, count, this.fmls);
     }
 }
 
 export function format(datas, count, formulas) {
     if (datas) {
-        var result = [],
+        let result = [],
             isArray = util.isArray(formulas);
-        for (var i = 0, len = datas.length; i < len; i++) {
-            var data = datas[i];
+        for (let i = 0, len = datas.length; i < len; i++) {
+            let data = datas[i];
             if (!util.isNull(data)) {
-                var formula = (isArray ? formulas[i] : formulas) || {};
+                let formula = (isArray ? formulas[i] : formulas) || {};
                 data = formatPlainData(datas[i]);
                 switch (formula.formula) {
                     case 'sum':
-                        result[i] = util.sum(data);
+                        result[i] = regNumber.test(data[0]) ? util.sum(data) : '';
                         break;
                     case 'avg':
-                        result[i] = (util.sum(data) / (count || data.length)).toFixed(formula.fixed || 2);
+                        result[i] = regNumber.test(data[0]) ? (util.sum(data) / (count || data.length)).toFixed(formula.fixed || 2) : '';
                         break;
                     case 'cnt':
                         result[i] = count || data.length;
@@ -99,11 +114,11 @@ export function format(datas, count, formulas) {
 }
 
 function formatPlainData(datas) {
-    var result = [];
-    for (var i = 0, len = datas.length; i < len; i++) {
-        var data = datas[i];
+    let result = [];
+    for (let i = 0, len = datas.length; i < len; i++) {
+        let data = datas[i];
         if (data) {
-            var val = data.$val;
+            let val = data.$val;
             result[i] = util.isNull(val) ? data : val;
         } else {
             result[i] = data;

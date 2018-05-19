@@ -54,9 +54,9 @@ strctData:
 */
 export default {
     format(datas, fields) {
-        var stDatas = [],
+        let stDatas = [],
             horizonMap = {};
-        for (var i = 0, len = datas.length; i < len; i++) {
+        for (let i = 0, len = datas.length; i < len; i++) {
             formatRowData(stDatas, datas[i], fields, horizonMap);
         }
         if (fields.isCross()) {
@@ -68,15 +68,15 @@ export default {
 }
 
 function sortData(datas, sortInfo, idx) {
-    var info = sortInfo[idx];
+    let info = sortInfo[idx];
     if (!info) {
         info = sortInfo[idx] = [];
-        for (var i = 0, len = datas.length; i < len; i++) {
+        for (let i = 0, len = datas.length; i < len; i++) {
             info.push(datas[i].$val);
         }
     } else {
         datas.sort(function(a, b) {
-            var va = a.$val,
+            let va = a.$val,
                 vb = b.$val,
                 ia = util.indexOf(info, va),
                 ib = util.indexOf(info, vb);
@@ -89,8 +89,8 @@ function sortData(datas, sortInfo, idx) {
             return ia === -1 || ia > ib ? 1 : -1;
         });
     }
-    if (!util.isArray(datas[0].$items[0])) {
-        for (var i = 0, len = datas.length; i < len; i++) {
+    if (datas.length && datas[0].$items && !util.isArray(datas[0].$items[0])) {
+        for (let i = 0, len = datas.length; i < len; i++) {
             sortData(datas[i].$items, sortInfo, idx + 1);
         }
     }
@@ -98,8 +98,8 @@ function sortData(datas, sortInfo, idx) {
 
 function completeData(datas, count, horizonMap) {
     if (count > 0) {
-        for (var i = 0, len = datas.length; i < len; i++) {
-            var data = datas[i];
+        for (let i = 0, len = datas.length; i < len; i++) {
+            let data = datas[i];
             completeData(data.$items, count - 1, horizonMap);
         }
     } else {
@@ -108,40 +108,40 @@ function completeData(datas, count, horizonMap) {
 }
 
 function completeDataRec(datas, horizonMap) {
-    var names = [];
-    for (var name in horizonMap) {
-        var idx = util.indexOf(datas, name, '$val');
+    let names = [];
+    for (let name in horizonMap) {
+        let idx = util.indexOf(datas, name, '$val');
         if (idx === -1) {
             names.push(name);
         } else {
             completeDataRec(datas[idx].$items, horizonMap[name]);
         }
     }
-    for (var i = 0, len = names.length; i < len; i++) {
-        var data = completeCloneData(datas[0]);
+    for (let i = 0, len = names.length; i < len; i++) {
+        let data = completeCloneData(datas[0]);
         data.$val = names[i];
         datas.push(data);
     }
 }
 
 function completeCloneData(data) {
-    var obj = {
+    let obj = {
         $val: data.$val,
         $field: data.$field,
         $revert: data.$revert
     };
-    var formula = data.$formula;
+    let formula = data.$formula;
     if (formula) {
         obj.$formula = new Array(formula.length);
     }
-    var items = data.$items,
+    let items = data.$items,
         dItems = obj.$items = [];
     if (util.isArray(items[0])) {
-        for (var i = 0, len = items.length; i < len; i++) {
+        for (let i = 0, len = items.length; i < len; i++) {
             dItems[i] = [0];
         }
     } else {
-        for (var i = 0, len = items.length; i < len; i++) {
+        for (let i = 0, len = items.length; i < len; i++) {
             dItems[i] = completeCloneData(items[i]);
         }
     }
@@ -149,10 +149,10 @@ function completeCloneData(data) {
 }
 
 function formatFieldData(data, rData, fields, horizonMap) {
-    for (var i = 0, len = fields.length; i < len; i++) {
-        var fieldObj = fields[i],
+    for (let i = 0, len = fields.length; i < len; i++) {
+        let fieldObj = fields[i],
             field = fieldObj.field(),
-            dataObj;
+            dataObj, formula;
         if (field === -1) {
             data.push(dataObj = {
                 $items: [],
@@ -160,9 +160,9 @@ function formatFieldData(data, rData, fields, horizonMap) {
                 $revert: horizonMap && !i
             });
         } else {
-            var value = rData[field],
-                idx = util.indexOf(data, value, '$val'),
-                formula = fieldObj.formula();
+            let value = rData[field],
+                idx = util.indexOf(data, value, '$val');
+            formula = fieldObj.formula();
             if (idx === -1) {
                 data.push(dataObj = {
                     $val: value,
@@ -173,12 +173,12 @@ function formatFieldData(data, rData, fields, horizonMap) {
             } else {
                 dataObj = data[idx];
             }
-            if (formula) {
-                dataObj.$formula = formula.collect(rData, dataObj.$formula, field);
-            }
             if (horizonMap) {
                 horizonMap = horizonMap[value] = horizonMap[value] || {};
             }
+        }
+        if (formula) {
+            dataObj.$formula = formula.collect(rData, dataObj.$formula, field);
         }
         data = dataObj.$items;
     }
@@ -188,8 +188,8 @@ function formatFieldData(data, rData, fields, horizonMap) {
 function formatRowData(data, rData, fields, horizonMap) {
     data = formatFieldData(data, rData, fields.verticalFields());
     data = formatFieldData(data, rData, fields.horizonFields(), horizonMap);
-    var kfields = fields.keyFields();
-    for (var i = 0, len = kfields.length; i < len; i++) {
+    let kfields = fields.keyFields();
+    for (let i = 0, len = kfields.length; i < len; i++) {
         (data[i] = data[i] || []).push(rData[kfields[i].field()]);
     }
 }

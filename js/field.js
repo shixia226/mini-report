@@ -8,21 +8,28 @@ const FEILD_HORIZON = 'h',
 
 class Field {
     constructor(field, headers) {
-        if (util.isString(field)) {
+        if (!util.isObject(field)) {
             field = { field: field };
         }
-        var converge = field.converge;
+        let converge = field.converge;
         this.cvg = converge === FEILD_HORIZON || converge === FEILD_VERTICAL ? converge : FEILD_KEY;
-        if (field.field) {
-            this.idx = util.indexOf(headers, field.field);
+        if (!util.isNull(field.field)) {
+            if (util.isString(field.field)) {
+                this.idx = util.indexOf(headers, field.field);
+            } else {
+                this.idx = parseInt(field.field);
+                if (this.idx < 0 || this.idx >= headers.length) {
+                    throw new Error('Invalid Field: ' + field.field);
+                }
+            }
             if (this.idx === -1) {
                 throw new Error('Unknown Field: ' + field.field);
             }
-            if (field.formula) {
-                this.fm = new Formula(field.formula);
-            }
         } else {
             this.idx = -1;
+        }
+        if (field.formula) {
+            this.fm = new Formula(field.formula, headers);
         }
     }
     field() {
@@ -54,15 +61,15 @@ export default class {
      *  ['field1', 'field2', 'field4', 'field3', 'field5']
      */
     constructor(fields, headers) {
-        var fieldMap = this.fields = {
+        let fieldMap = this.fields = {
                 [FEILD_HORIZON]: [],
                 [FEILD_VERTICAL]: [],
                 [FEILD_KEY]: []
             },
             idxs = {},
             emptyFields = {};
-        for (var i = 0, len = fields.length; i < len; i++) {
-            var field = new Field(fields[i], headers),
+        for (let i = 0, len = fields.length; i < len; i++) {
+            let field = new Field(fields[i], headers),
                 idx = field.field(),
                 cvg = field.converge();
             if (idx === -1) { //需要处理列表展示，此时field设置为空，表示不再分组

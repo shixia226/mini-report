@@ -3,7 +3,7 @@ export default {
         if (!name) {
             return arr.indexOf(value);
         } else {
-            for (var i = 0, len = arr.length; i < len; i++) {
+            for (let i = 0, len = arr.length; i < len; i++) {
                 if (arr[i][name] === value) return i;
             }
             return -1;
@@ -18,6 +18,9 @@ export default {
     isObject(arr) {
         return Object.prototype.toString.call(arr) === '[object Object]';
     },
+    isFunction(arr) {
+        return Object.prototype.toString.call(arr) === '[object Function]';
+    },
     isNull(obj) {
         return obj === null || obj === undefined;
     },
@@ -25,8 +28,8 @@ export default {
         return this.isNull(arr) ? [] : (this.isArray(arr) ? arr : [arr]);
     },
     sum(arr) {
-        var sum = 0;
-        for (var i = 0, len = arr.length; i < len; i++) {
+        let sum = 0;
+        for (let i = 0, len = arr.length; i < len; i++) {
             sum += (parseFloat(arr[i], 10) || 0);
         }
         return sum;
