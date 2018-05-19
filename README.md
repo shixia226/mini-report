@@ -126,7 +126,7 @@ Report.format(data, [{
     field: 1,
     converge: 'h',
     formula: 'sum'
-}, 2]
+}, 2])
 ```
 
 output:
@@ -149,7 +149,7 @@ Report.format(data, [{
         formula: 'sum',
         field: 2
     }
-}, 2]
+}, 2])
 ```
 
 output:
