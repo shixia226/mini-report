@@ -1,4 +1,4 @@
-import util from './util';
+const util = require('./util');
 
 /*
 **************
@@ -52,7 +52,7 @@ strctData:
     }
 ]
 */
-export default {
+module.exports = {
     format(datas, fields) {
         let stDatas = [],
             horizonMap = {};
@@ -75,7 +75,7 @@ function sortData(datas, sortInfo, idx) {
             info.push(datas[i].$val);
         }
     } else {
-        datas.sort(function(a, b) {
+        datas.sort(function (a, b) {
             let va = a.$val,
                 vb = b.$val,
                 ia = util.indexOf(info, va),

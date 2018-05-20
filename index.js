@@ -1,7 +1,7 @@
-import util from './js/util';
-import Fields from './js/field';
-import struct from './js/struct';
-import { format } from './js/formula';
+const util = require('./js/util');
+const Fields = require('./js/field');
+const struct = require('./js/struct');
+const format = require('./js/format');
 
 module.exports = {
     /**
@@ -28,7 +28,7 @@ module.exports = {
      *      field: 'name'
      *  }, {}])
      */
-    format: function(data, fields, options) {
+    format: function (data, fields, options) {
         if (!data) return;
         options = options || {};
         let headers = data.fields,
@@ -43,10 +43,13 @@ module.exports = {
             formatHeader(fmHeaders[0], field.keyFields(), headers, 1, options);
         }
         formatHeader(fmHeaders[0], field.verticalFields(), headers, fmHeaders.length, options);
-        fmDatas.datas = expandData([fmDatas], options);
+        let fmData = expandData([fmDatas], options);
         adornData(fmHeaders);
-        adornData(fmDatas.datas);
-        return fmDatas;
+        adornData(fmData);
+        return {
+            header: fmHeaders,
+            data: fmData
+        };
     }
 }
 

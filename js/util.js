@@ -1,4 +1,4 @@
-export default {
+module.exports = {
     indexOf(arr, value, name) {
         if (!name) {
             return arr.indexOf(value);

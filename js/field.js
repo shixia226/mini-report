@@ -1,6 +1,5 @@
-import util from './util';
-import Formula from './formula';
-
+const util = require('./util');
+const Formula = require('./formula');
 
 const FEILD_HORIZON = 'h',
     FEILD_VERTICAL = 'v',
@@ -43,7 +42,7 @@ class Field {
     }
 }
 
-export default class {
+class Fields {
     /**
      * @param {*} fields 
      *  [{
@@ -62,10 +61,10 @@ export default class {
      */
     constructor(fields, headers) {
         let fieldMap = this.fields = {
-                [FEILD_HORIZON]: [],
-                [FEILD_VERTICAL]: [],
-                [FEILD_KEY]: []
-            },
+            [FEILD_HORIZON]: [],
+            [FEILD_VERTICAL]: [],
+            [FEILD_KEY]: []
+        },
             idxs = {},
             emptyFields = {};
         for (let i = 0, len = fields.length; i < len; i++) {
@@ -104,3 +103,5 @@ export default class {
         return this.verticalFields().length && this.horizonFields().length;
     }
 }
+
+module.exports = Fields;

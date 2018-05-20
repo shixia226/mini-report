@@ -1,4 +1,5 @@
-import util from './util';
+const util = require('./util');
+const format = require('./format');
 /**
  * sum 求和
  * avg 求平均，除数取按照下一分类个数，没有下一分类的取数据条数
@@ -8,9 +9,7 @@ import util from './util';
  */
 const FORMULAS = ['sum', 'avg', 'cnt', 'lst', 'fmt'];
 
-const regNumber = /^\d+(\.\d+)?$/;
-
-export default class Formula {
+class Formula {
     constructor(formulas, headers) {
         let fms = this.fmls = [],
             wrapFmls = this.wrapFmls = [];
@@ -62,7 +61,7 @@ export default class Formula {
             return datas;
         }
     }
-    export (datas, count) {
+    export(datas, count) {
         let tmpData = [];
         for (let i = 0, len = this.wrapFmls.length; i < len; i++) {
             let formula = this.wrapFmls[i];
@@ -78,51 +77,4 @@ export default class Formula {
     }
 }
 
-export function format(datas, count, formulas) {
-    if (datas) {
-        let result = [],
-            isArray = util.isArray(formulas);
-        for (let i = 0, len = datas.length; i < len; i++) {
-            let data = datas[i];
-            if (!util.isNull(data)) {
-                let formula = (isArray ? formulas[i] : formulas) || {};
-                data = formatPlainData(datas[i]);
-                switch (formula.formula) {
-                    case 'sum':
-                        result[i] = regNumber.test(data[0]) ? util.sum(data) : '';
-                        break;
-                    case 'avg':
-                        result[i] = regNumber.test(data[0]) ? (util.sum(data) / (count || data.length)).toFixed(formula.fixed || 2) : '';
-                        break;
-                    case 'cnt':
-                        result[i] = count || data.length;
-                        break;
-                    case 'lst':
-                        result[i] = data.join(formula.split || ',');
-                        break;
-                    case 'fmt':
-                        result[i] = (formula.format || {})[data[0]] || data[0];
-                        break;
-                    default:
-                        result[i] = regNumber.test(data[0]) ? util.sum(data) : data[0];
-                        break;
-                }
-            }
-        }
-        return result;
-    }
-}
-
-function formatPlainData(datas) {
-    let result = [];
-    for (let i = 0, len = datas.length; i < len; i++) {
-        let data = datas[i];
-        if (data) {
-            let val = data.$val;
-            result[i] = util.isNull(val) ? data : val;
-        } else {
-            result[i] = data;
-        }
-    }
-    return result;
-}
+module.exports = Formula;
