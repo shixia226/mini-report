@@ -75,6 +75,13 @@ class Formula {
     format(datas, count) {
         return format(datas, count, this.fmls);
     }
+    detail () {
+        for (let i = 0, len = this.wrapFmls.length; i < len; i++) {
+            let formula = this.wrapFmls[i];
+            if (formula.detail === false) return false;
+        }
+        return true;
+    }
 }
 
 module.exports = Formula;

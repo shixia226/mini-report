@@ -1,18 +1,28 @@
 {
     "name": "mini-report",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "main": "index.js",
     "dependencies": {},
-    "devDependencies": {},
-    "scripts": {},
+    "devDependencies": {
+    },
+    "scripts": {
+    },
+    "keywords": [
+        "mini-report",
+        "report",
+        "javascript",
+        "converge",
+        "row denormaliser",
+        "shixia226"
+    ],
+    "author": "shixia",
+    "license": "MIT",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/shixia226/mini-report.git"
     },
-    "author": "shixia",
-    "license": "MIT",
     "bugs": {
-        "url": "https://github.com/shixia226/mini-report/issues"
+    "url": "https://github.com/shixia226/mini-report/issues"
     },
     "homepage": "https://github.com/shixia226/mini-report#readme",
     "description": "Mini Report"

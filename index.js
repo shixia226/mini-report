@@ -109,7 +109,7 @@ function expandData(datas, options) {
             cDatas = rowData.datas,
             hformula = rowData.hformula,
             vformula = rowData.vformula,
-            firstRow = cDatas[0],
+            firstRow = cDatas[0] || [],
             empty = [];
         let count = cDatas.length;
         if (vformula) {
@@ -161,7 +161,7 @@ function revertFormatData(datas) {
         count = firstRow.length,
         idx = 0;
     for (; idx < count; idx++) {
-        if (firstRow[idx].$key) {
+        if (firstRow[idx].$key || firstRow[idx].$formula) {
             break;
         }
     }
@@ -264,7 +264,11 @@ function formatData(stDatas, options, indexs, idx) {
         vformula = formula.export(collapseData(fmDatas), count);
     }
     if (revert) {
-        return revertFormatData(expandData([{ datas: fmDatas, vformula: vformula }], options));
+        let exData = expandData([{ datas: fmDatas, vformula: vformula }], options);
+        if (formula && !formula.detail() && vformula) {
+            exData.splice(0, exData.length - vformula.length);
+        }
+        return revertFormatData(exData);
     } else {
         return { datas: fmDatas, count: count, headers: headers, vformula: vformula };
     }

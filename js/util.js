@@ -9,6 +9,22 @@ module.exports = {
             return -1;
         }
     },
+    call(handler, context) {
+        if (!handler) return;
+        var args = [].slice.call(arguments, 2);
+        if (this.isFunction(handler)) {
+            return handler.apply(context, args);
+        } else {
+            context = handler.context || context;
+            args = (handler.args || []).concat(args);
+            if (this.isString(handler) || this.isString(handler = handler.handler)) {
+                handler = context ? context[handler] : null;
+            }
+            if (this.isFunction(handler)) {
+                return handler.apply(context, args);
+            }
+        }
+    },
     isString(str) {
         return Object.prototype.toString.call(str) === '[object String]';
     },

@@ -25,7 +25,8 @@ module.exports = function (datas, count, formulas) {
                         result[i] = data.join(formula.split || ',');
                         break;
                     case 'fmt':
-                        result[i] = (util.isFunction(formula.format) ? formula.format(data) : (formula.format || {})[data[0]]) || '';
+                        let fmt = util.call(formula.format, null, data);
+                        result[i] = util.isNull(fmt) ? (formula.format || {})[data[0]] || '' : fmt;
                         break;
                     default:
                         result[i] = regNumber.test(data[0]) ? util.sum(data) : data[0];
