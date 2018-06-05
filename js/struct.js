@@ -1,4 +1,5 @@
-const util = require('./util');
+const util = require('./util'),
+    fmtKey = require('./key');
 
 /*
 **************
@@ -72,12 +73,12 @@ function sortData(datas, sortInfo, idx) {
     if (!info) {
         info = sortInfo[idx] = [];
         for (let i = 0, len = datas.length; i < len; i++) {
-            info.push(datas[i].$val);
+            info.push(datas[i][fmtKey.VALUE]);
         }
     } else {
-        datas.sort(function (a, b) {
-            let va = a.$val,
-                vb = b.$val,
+        datas.sort(function(a, b) {
+            let va = a[fmtKey.VALUE],
+                vb = b[fmtKey.VALUE],
                 ia = util.indexOf(info, va),
                 ib = util.indexOf(info, vb);
             if (ia === -1) {
@@ -110,7 +111,7 @@ function completeData(datas, count, horizonMap) {
 function completeDataRec(datas, horizonMap) {
     let names = [];
     for (let name in horizonMap) {
-        let idx = util.indexOf(datas, name, '$val');
+        let idx = util.indexOf(datas, name, fmtKey.VALUE);
         if (idx === -1) {
             names.push(name);
         } else {
@@ -119,14 +120,14 @@ function completeDataRec(datas, horizonMap) {
     }
     for (let i = 0, len = names.length; i < len; i++) {
         let data = completeCloneData(datas[0]);
-        data.$val = names[i];
+        data[fmtKey.VALUE] = names[i];
         datas.push(data);
     }
 }
 
 function completeCloneData(data) {
     let obj = {
-        $val: data.$val,
+        [fmtKey.VALUE]: data[fmtKey.VALUE],
         $field: data.$field,
         $revert: data.$revert
     };
@@ -161,11 +162,11 @@ function formatFieldData(data, rData, fields, horizonMap) {
             });
         } else {
             let value = rData[field],
-                idx = util.indexOf(data, value, '$val');
+                idx = util.indexOf(data, value, fmtKey.VALUE);
             formula = fieldObj.formula();
             if (idx === -1) {
                 data.push(dataObj = {
-                    $val: value,
+                    [fmtKey.VALUE]: value,
                     $items: [],
                     $field: fieldObj,
                     $revert: horizonMap && !i

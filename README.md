@@ -188,7 +188,7 @@ output:
 | '英语'   | 145     | 62      |
 | ''      | ''      | 83       |
 
-#### 7. Multilevel Formula
+#### 7. Multilevel Cross Formula
 ```javascript
 Report.format({
     fields: ['province', 'city', 'count', 'industry', 'type'],
@@ -277,15 +277,16 @@ output:
 | 全国合计 | ''    | 103600 | 69700 | 33900  | 37100 | 12400  | 24700 | 58600  |
 
 ### API
+#### 1. Conversion Of Data
 ```
 Report.format(data, fields, options)
 ```
 
-#### data: Object
+##### data: Object
 * fields
 * data
 
-#### fields: Array(Number/String/Object)
+##### fields: Array(Number/String/Object)
 * Number: Field Index
 * String: Field String
 * Object
@@ -300,7 +301,19 @@ Report.format(data, fields, options)
             * format(Function/Object)
             * detail(Boolean)
 
-#### options: Object
+##### options: Object
+* {field}(String)
+* {formula}(String)
+
+#### 2. Configuring Conversion Parameters
+```
+Report.config(options)
+```
+
+##### options
+* VALUE(String): The result of the value key in the result data, the default is '$val'
+* ROWSPAN(String): The result of the rowspan key in the result data, the default is '$rs'
+* COLSPAN(String): The result of the colspan key in the result data, the default is '$cs'
 * {field}(String)
 * {formula}(String)
 

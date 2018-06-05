@@ -2,6 +2,7 @@ const util = require('./js/util');
 const Fields = require('./js/field');
 const struct = require('./js/struct');
 const format = require('./js/format');
+const fmtKey = require('./js/key');
 
 module.exports = {
     /**
@@ -28,9 +29,9 @@ module.exports = {
      *      field: 'name'
      *  }, {}])
      */
-    format: function (data, fields, options) {
+    format: function(data, fields, options) {
         if (!data) return;
-        options = options || {};
+        options = Object.assign(options || {}, fmtKey);
         let headers = data.fields,
             field = new Fields(fields, headers),
             stDatas = struct.format(data.data, field),
@@ -50,6 +51,9 @@ module.exports = {
             header: fmHeaders,
             data: fmData
         };
+    },
+    config: function(options) {
+        Object.assign(fmtKey, options);
     }
 }
 
@@ -63,11 +67,17 @@ function formatHeader(header, fields, headers, rs, options) {
                 let formulas = formula.formulas();
                 for (let k = formulas.length - 1; k >= 0; k--) {
                     let formula = formulas[k];
-                    header.unshift({ $val: options[formula] || formula, $rs: rs });
+                    header.unshift({
+                        [fmtKey.VALUE]: options[formula] || formula,
+                        [fmtKey.ROWSPAN]: rs
+                    });
                 }
             }
             field = headers[field];
-            header.unshift({ $val: options[field] || field, $rs: rs });
+            header.unshift({
+                [fmtKey.VALUE]: options[field] || field,
+                [fmtKey.ROWSPAN]: rs
+            });
         }
     }
 }
@@ -78,10 +88,10 @@ function adornData(datas) {
         for (let c = 0, clen = rowData.length; c < clen; c++) {
             let data = rowData[c];
             if (util.isObject(data)) {
-                let rs = data.$rs,
-                    cs = data.$cs;
+                let rs = data[fmtKey.ROWSPAN],
+                    cs = data[fmtKey.COLSPAN];
                 if ((!rs || rs <= 1) && (!cs || cs <= 1)) {
-                    rowData[c] = data.$val;
+                    rowData[c] = data[fmtKey.VALUE];
                 }
             }
         }
@@ -95,7 +105,7 @@ function collapseData(datas) {
         for (let c = 0, clen = rowData.length; c < clen; c++) {
             let data = rowData[c];
             if (data && data.$key) {
-                (result[c] = result[c] || []).push(data.$val);
+                (result[c] = result[c] || []).push(data[fmtKey.VALUE]);
             }
         }
     }
@@ -125,14 +135,20 @@ function expandData(datas, options) {
                 }
                 for (let c = 0, clen = vfDatas.length; c < clen; c++) {
                     if (!util.isNull(vfDatas[c])) {
-                        vfDatas[c] = { $val: vfDatas[c], $formula: true };
+                        vfDatas[c] = {
+                            [fmtKey.VALUE]: vfDatas[c],
+                            $formula: true
+                        };
                     }
                 }
                 vfDatas.unshift.apply(vfDatas, empty);
                 if (util.isFunction(vfm.formula)) {
                     vfm.formula(vfDatas);
                 } else if (cs > 0) {
-                    vfDatas[0] = { $val: options[vfm.formula] || vfm.formula, $cs: cs };
+                    vfDatas[0] = {
+                        [fmtKey.VALUE]: options[vfm.formula] || vfm.formula,
+                        [fmtKey.COLSPAN]: cs
+                    };
                 }
                 cDatas.push(vfDatas);
                 count++;
@@ -140,12 +156,18 @@ function expandData(datas, options) {
         }
         if (hformula) {
             for (let i = hformula.length - 1; i >= 0; i--) {
-                firstRow.unshift({ $val: hformula[i], $rs: count });
+                firstRow.unshift({
+                    [fmtKey.VALUE]: hformula[i],
+                    [fmtKey.ROWSPAN]: count
+                });
                 empty.push(undefined);
             }
         }
         if (rowData.value) {
-            firstRow.unshift({ $val: rowData.value, $rs: count });
+            firstRow.unshift({
+                [fmtKey.VALUE]: rowData.value,
+                [fmtKey.ROWSPAN]: count
+            });
             empty.push(undefined);
             for (let i = 1; i < count; i++) {
                 cDatas[i].unshift.apply(cDatas[i], empty);
@@ -190,11 +212,11 @@ function revertData(datas) {
         for (let c = 0, clen = rowData.length; c < clen; c++) {
             let data = rowData[c];
             if (data) {
-                let rs = data.$rs,
-                    cs = data.$cs;
+                let rs = data[fmtKey.ROWSPAN],
+                    cs = data[fmtKey.COLSPAN];
                 if (rs || cs) {
-                    data.$rs = cs || 1;
-                    data.$cs = rs || 1;
+                    data[fmtKey.ROWSPAN] = cs || 1;
+                    data[fmtKey.COLSPAN] = rs || 1;
                 }
             }
             (result[c] = result[c] || []).push(data);
@@ -207,7 +229,10 @@ function formatData(stDatas, options, indexs, idx) {
     if (util.isArray(stDatas[0])) { //到了最后一层
         stDatas = format(stDatas);
         for (let i = 0, len = stDatas.length; i < len; i++) {
-            stDatas[i] = { $val: stDatas[i], $key: true };
+            stDatas[i] = {
+                [fmtKey.VALUE]: stDatas[i],
+                $key: true
+            };
         }
         return { datas: [stDatas], count: 1 };
     }
@@ -218,7 +243,7 @@ function formatData(stDatas, options, indexs, idx) {
     for (let i = 0, len = stDatas.length; i < len; i++) {
         let data = stDatas[i];
         let items = data.$items,
-            value = data.$val;
+            value = data[fmtKey.VALUE];
         if (data.$revert) {
             revert = true;
             if (!indexs.$idx) {

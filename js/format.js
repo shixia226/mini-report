@@ -1,4 +1,5 @@
-const util = require('./util');
+const util = require('./util'),
+    fmtKey = require('./key');
 
 const regNumber = /^\d+(\.\d+)?$/;
 
@@ -43,7 +44,7 @@ function formatPlainData(datas) {
     for (let i = 0, len = datas.length; i < len; i++) {
         let data = datas[i];
         if (data) {
-            let val = data.$val;
+            let val = data[fmtKey.VALUE];
             result[i] = util.isNull(val) ? data : val;
         } else {
             result[i] = data;
